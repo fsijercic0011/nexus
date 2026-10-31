@@ -1,0 +1,24 @@
+{
+  "name": "nexus",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@12.16.1",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "dev": "pnpm --parallel --filter @nexus/api --filter @nexus/web dev",
+    "build": "pnpm -r build",
+    "test": "pnpm -r test",
+    "typecheck": "pnpm -r typecheck",
+    "lint": "biome check .",
+    "format": "biome check --write .",
+    "db:generate": "pnpm --filter @nexus/api db:generate",
+    "db:migrate": "pnpm --filter @nexus/api db:migrate",
+    "e2e": "pnpm --filter @nexus/web e2e"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.6.4",
+    "typescript": "^7.0.2"
+  }
+}

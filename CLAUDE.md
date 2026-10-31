@@ -137,8 +137,26 @@ Every feature goes **spec → plan → build → verify → docs**:
   append-only, applied by an explicit command — never at startup.
 - Write endpoints accept idempotency keys; IDs are UUIDv7.
 - Verify every change with lint, typecheck and tests (Biome, `tsc`, Vitest;
-  Playwright for critical flows) and by running the app. Exact commands are
-  listed here once the repo is scaffolded.
+  Playwright for critical flows) and by running the app.
+
+## Commands
+
+Run from the repo root (pnpm 12, Node 24):
+
+| Command | What it does |
+| --- | --- |
+| `pnpm install` | Install all workspace dependencies |
+| `pnpm dev` | API (`:3000`) and web dev server (`:5173`, proxies `/api`) with reload |
+| `pnpm build` | Build every package and app |
+| `pnpm test` | All unit and integration tests (integration tests need `.env.local`) |
+| `pnpm typecheck` | TypeScript check across the workspace |
+| `pnpm lint` / `pnpm format` | Biome check / apply fixes (code only, not Markdown) |
+| `pnpm db:generate` | Generate a migration from the Drizzle schema |
+| `pnpm db:migrate` | Apply migrations (uses `DATABASE_URL_UNPOOLED`) |
+| `pnpm e2e` | Playwright smoke tests against the built app (run `pnpm build` first) |
+
+Before calling a change done: `pnpm lint && pnpm typecheck && pnpm test`,
+plus `pnpm build && pnpm e2e` when the change touches the UI or serving.
 
 ## graphify
 
