@@ -12,6 +12,7 @@
     "db:migrate": "tsx src/infrastructure/db/migrate.ts"
   },
   "dependencies": {
+    "@fastify/static": "^10.1.8",
     "@nexus/shared": "workspace:*",
     "drizzle-orm": "^0.45.4",
     "fastify": "^5.12.7",

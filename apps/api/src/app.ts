@@ -1,5 +1,9 @@
 import Fastify, { type FastifyInstance } from "fastify";
 import type { AppConfig } from "./infrastructure/config.js";
+import {
+  registerJsonNotFound,
+  registerWebApp,
+} from "./infrastructure/web-app.js";
 import { healthRoutes } from "./modules/health/routes.js";
 
 export type BuildAppOptions = {
@@ -23,6 +27,12 @@ export async function buildApp(
     },
     { prefix: "/api" },
   );
+
+  if (options.config.webDistDir) {
+    await registerWebApp(app, options.config.webDistDir);
+  } else {
+    registerJsonNotFound(app);
+  }
 
   return app;
 }
