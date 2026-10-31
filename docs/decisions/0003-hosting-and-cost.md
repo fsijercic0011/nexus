@@ -1,5 +1,7 @@
 # 0003 — Hosting and running cost
 
+> The "MinIO locally" note is superseded by 0009.
+
 ## Context
 
 NEXUS is used mainly by its developer and possibly a few friends. Running cost

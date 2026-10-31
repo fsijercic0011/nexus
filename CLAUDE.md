@@ -51,9 +51,12 @@ A **modular monolith** in a pnpm workspaces monorepo (ADR 0001, 0002):
 - `packages/shared` — Zod schemas and types shared by web and API.
 - **Postgres** via Drizzle ORM. Auth via Better Auth (email + password, Google,
   TOTP 2FA).
-- **Files** in Cloudflare R2 (MinIO locally), served only via signed,
-  time-limited URLs.
+- **Files** in Cloudflare R2, served only via signed, time-limited URLs.
 - **Hosting:** Railway (API + Postgres), one deployment (ADR 0003).
+- **Local development:** no Docker. Apps run directly on the machine against a
+  hosted dev/test Postgres (`DATABASE_URL` in `.env`, never production).
+  Integration tests roll back or drop their own data. CI uses a Postgres
+  service container (ADR 0009).
 
 Add a new app or package (e.g. `apps/home-bridge`) only when a feature needs
 it. Don't add Redis, queues or separate services without an ADR.

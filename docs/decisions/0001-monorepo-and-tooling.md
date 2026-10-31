@@ -1,5 +1,8 @@
 # 0001 — Monorepo and tooling
 
+> Local development (Docker Compose) and the pnpm install method are superseded
+> by 0009.
+
 ## Context
 
 NEXUS is a single-developer project (with Claude) with a web app, an API and,
