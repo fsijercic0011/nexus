@@ -54,8 +54,10 @@ A **modular monolith** in a pnpm workspaces monorepo (ADR 0001, 0002):
 - **Files** in Cloudflare R2, served only via signed, time-limited URLs.
 - **Hosting:** Railway (API + Postgres), one deployment (ADR 0003).
 - **Local development:** no Docker. Apps run directly on the machine against a
-  hosted dev/test Postgres on Neon (`DATABASE_URL` in `.env`, never
-  production).
+  hosted dev/test Postgres on Neon, never production. `neon init` links the
+  repo (`.neon`, gitignored) and writes `.env.local` (gitignored):
+  `DATABASE_URL` (pooled, for the app) and `DATABASE_URL_UNPOOLED` (direct,
+  for migrations).
   Integration tests roll back or drop their own data. CI uses a Postgres
   service container (ADR 0009).
 
