@@ -39,6 +39,28 @@ they are more than an hour old.
 Connections select the schema with the `-c search_path=…` startup option,
 because Neon ignores a plain `search_path` startup parameter.
 
+## End-to-end tests
+
+`pnpm e2e` runs the Playwright smoke tests in `apps/web/e2e` against the
+**built** app: it starts the compiled API on port 3100 serving
+`apps/web/dist`. Run `pnpm build` first. Install the browser once with
+`pnpm --filter @nexus/web exec playwright install chromium`.
+
+## Continuous integration
+
+`.github/workflows/ci.yml` runs on every pull request and on pushes to
+`main`: install, lint, typecheck, build, migrate, test and e2e, against a
+Postgres 18 service container instead of Neon. To reproduce it locally:
+
+```sh
+pnpm install --frozen-lockfile && pnpm lint && pnpm typecheck && pnpm build && pnpm db:migrate && pnpm test && pnpm e2e
+```
+
+pnpm runs dependency install scripts only for packages listed under
+`allowBuilds` in `pnpm-workspace.yaml` (currently `esbuild`). A new
+dependency that needs one fails `pnpm install --frozen-lockfile` until it is
+approved with `pnpm approve-builds <package>`.
+
 ## Migrations
 
 - Change the Drizzle schema in `apps/api/src/infrastructure/db/schema/`, then
