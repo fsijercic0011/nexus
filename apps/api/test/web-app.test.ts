@@ -72,3 +72,20 @@ describe("serving the web app", () => {
     expect(response.json()).toEqual({ status: "ok", database: "ok" });
   });
 });
+
+describe("misconfigured web app", () => {
+  it("fails startup when WEB_DIST_DIR has no index.html", async () => {
+    await expect(
+      buildApp({
+        config: {
+          nodeEnv: "test",
+          host: "127.0.0.1",
+          port: 0,
+          databaseUrl: "postgres://unused",
+          webDistDir: join(tmpdir(), "nexus-missing-dist"),
+        },
+        checkDatabase: async () => true,
+      }),
+    ).rejects.toThrow(/WEB_DIST_DIR/);
+  });
+});

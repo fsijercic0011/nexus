@@ -11,3 +11,5 @@
   `GET /api/health`, Drizzle migrations and isolated test schemas on Neon.
 - Added the React web app (health status), SPA serving from the API, a
   Playwright smoke test and GitHub Actions CI.
+- Integration tests use a throwaway database per test (ADR 0011); malformed
+  database URLs and a missing web build now fail startup with a named variable.

@@ -30,14 +30,13 @@ change.
 `DATABASE_URL_UNPOOLED`; without it they are skipped with a warning.
 
 Each test that needs a database calls `createTestDatabase()`
-(`apps/api/test/test-database.ts`). It creates a throwaway schema named
-`test_<timestamp>_<random>`, runs all migrations into it, and drops it
-afterwards. Tests never touch `public` or any other schema. Schemas left behind
-by a crashed run are dropped automatically at the start of the next run once
-they are more than an hour old.
-
-Connections select the schema with the `-c search_path=…` startup option,
-because Neon ignores a plain `search_path` startup parameter.
+(`apps/api/test/test-database.ts`). It creates a throwaway **database** named
+`test_<timestamp>_<random>` on the same Neon branch, runs all migrations into
+it, and drops it afterwards. A whole database rather than a schema, because
+drizzle-kit writes `"public".`-qualified SQL that would escape a schema. Tests
+never touch the dev database's own data. Test databases left behind by a
+crashed run are dropped automatically at the start of the next run once they
+are more than an hour old (ADR 0011).
 
 ## End-to-end tests
 

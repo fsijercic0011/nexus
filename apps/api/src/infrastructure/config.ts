@@ -15,13 +15,41 @@ export class ConfigError extends Error {
   }
 }
 
+/**
+ * True for a well-formed postgres:// URL. postgres.js parses malformed URLs
+ * loosely (e.g. an unencoded "/" in the password) and then reports the
+ * password as a hostname, so reject them before they reach it.
+ */
+function isPostgresUrl(value: string): boolean {
+  if (!URL.canParse(value)) return false;
+  const url = new URL(value);
+  return (
+    (url.protocol === "postgres:" || url.protocol === "postgresql:") &&
+    url.hostname !== "" &&
+    !/[:@]/.test(url.hostname)
+  );
+}
+
+const postgresUrl = z.string().min(1).refine(isPostgresUrl);
+
+/** Validates a Postgres URL from the environment; errors name the variable only. */
+export function parseDatabaseUrl(
+  name: string,
+  value: string | undefined,
+): string {
+  if (value === undefined || !postgresUrl.safeParse(value).success) {
+    throw new ConfigError([name]);
+  }
+  return value;
+}
+
 const envSchema = z.object({
   NODE_ENV: z
     .enum(["development", "test", "production"])
     .default("development"),
   HOST: z.string().min(1).optional(),
   PORT: z.coerce.number().int().min(0).max(65535).default(3000),
-  DATABASE_URL: z.string().min(1),
+  DATABASE_URL: postgresUrl,
   WEB_DIST_DIR: z.string().min(1).optional(),
 });
 

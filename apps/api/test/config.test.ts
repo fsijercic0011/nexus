@@ -35,3 +35,28 @@ describe("loadConfig", () => {
     expect(message).not.toContain("abc");
   });
 });
+
+describe("database URL validation", () => {
+  it("rejects a malformed DATABASE_URL without echoing it", () => {
+    let error: unknown;
+    try {
+      loadConfig({ DATABASE_URL: "postgres://owner:ab/cd@host/db" });
+    } catch (caught) {
+      error = caught;
+    }
+    expect(error).toBeInstanceOf(ConfigError);
+    expect((error as ConfigError).message).toContain("DATABASE_URL");
+    expect((error as ConfigError).message).not.toContain("ab/cd");
+  });
+
+  it("rejects a non-Postgres URL", () => {
+    expect(() => loadConfig({ DATABASE_URL: "mysql://u:p@host/db" })).toThrow(
+      ConfigError,
+    );
+  });
+
+  it("accepts a URL with an encoded password", () => {
+    const url = "postgresql://owner:ab%2Fcd@host.example/db?sslmode=require";
+    expect(loadConfig({ DATABASE_URL: url }).databaseUrl).toBe(url);
+  });
+});

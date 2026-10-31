@@ -1,5 +1,6 @@
 import { fileURLToPath } from "node:url";
 import { migrate } from "drizzle-orm/postgres-js/migrator";
+import { parseDatabaseUrl } from "../config.js";
 import { loadEnvFileIfPresent } from "../env-file.js";
 import { createDatabase, type Database } from "./client.js";
 
@@ -7,21 +8,18 @@ const migrationsFolder = fileURLToPath(
   new URL("./migrations", import.meta.url),
 );
 
-export async function runMigrations(
-  database: Database,
-  options: { migrationsSchema?: string } = {},
-): Promise<void> {
-  await migrate(database.db, { migrationsFolder, ...options });
+export async function runMigrations(database: Database): Promise<void> {
+  await migrate(database.db, { migrationsFolder });
 }
 
 async function main(): Promise<void> {
   loadEnvFileIfPresent(
     fileURLToPath(new URL("../../../../../.env.local", import.meta.url)),
   );
-  const url = process.env.DATABASE_URL_UNPOOLED;
-  if (!url) {
-    throw new Error("DATABASE_URL_UNPOOLED is not set");
-  }
+  const url = parseDatabaseUrl(
+    "DATABASE_URL_UNPOOLED",
+    process.env.DATABASE_URL_UNPOOLED,
+  );
   const database = createDatabase(url);
   try {
     await runMigrations(database);
