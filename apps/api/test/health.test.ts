@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { buildApp } from "../src/app.js";
 import type { AppConfig } from "../src/infrastructure/config.js";
+import { checkDatabase } from "../src/infrastructure/db/client.js";
+import { createTestDatabase } from "./test-database.js";
 
 const config: AppConfig = {
   nodeEnv: "test",
@@ -47,3 +49,26 @@ describe("GET /api/health", () => {
     await app.close();
   });
 });
+
+describe.skipIf(!process.env.DATABASE_URL_UNPOOLED)(
+  "GET /api/health with a real database",
+  () => {
+    it("reports ok against the real database", async () => {
+      const { database, cleanup } = await createTestDatabase();
+      const app = await buildApp({
+        config,
+        checkDatabase: () => checkDatabase(database),
+      });
+      try {
+        const response = await app.inject({
+          method: "GET",
+          url: "/api/health",
+        });
+        expect(response.statusCode).toBe(200);
+      } finally {
+        await app.close();
+        await cleanup();
+      }
+    });
+  },
+);

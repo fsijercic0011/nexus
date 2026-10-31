@@ -7,3 +7,5 @@
 - Dropped Docker for local development in favor of a hosted dev database
   (ADR 0009).
 - Linked the Neon dev project; standardized on PostgreSQL 18 (ADR 0010).
+- Scaffolded the pnpm monorepo: shared health contract, Fastify API with
+  `GET /api/health`, Drizzle migrations and isolated test schemas on Neon.

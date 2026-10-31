@@ -1,0 +1,52 @@
+# Local development
+
+The apps run directly on your machine against a hosted Neon dev database
+(ADR 0009). There is no Docker.
+
+## Prerequisites
+
+- Node 24 (`.nvmrc`) and pnpm 12 (`npm install -g pnpm`).
+- The Neon CLI (`npm i -g neon`), signed in with `neon login`.
+- The repo linked to the Neon project: `neon init` writes `.neon` and
+  `.env.local` (both gitignored). `.env.local` holds `DATABASE_URL` (pooled,
+  used by the app) and `DATABASE_URL_UNPOOLED` (direct, used by migrations and
+  tests). See `.env.example` for every variable.
+
+## First run
+
+```sh
+pnpm install
+pnpm db:migrate
+pnpm dev
+```
+
+`pnpm dev` starts the API on `http://127.0.0.1:3000` and the web dev server on
+`http://localhost:5173`, which proxies `/api` to the API. Both reload on
+change.
+
+## Tests
+
+`pnpm test` runs every package's tests. Integration tests in `apps/api` need
+`DATABASE_URL_UNPOOLED`; without it they are skipped with a warning.
+
+Each test that needs a database calls `createTestDatabase()`
+(`apps/api/test/test-database.ts`). It creates a throwaway schema named
+`test_<timestamp>_<random>`, runs all migrations into it, and drops it
+afterwards. Tests never touch `public` or any other schema. Schemas left behind
+by a crashed run are dropped automatically at the start of the next run once
+they are more than an hour old.
+
+Connections select the schema with the `-c search_path=…` startup option,
+because Neon ignores a plain `search_path` startup parameter.
+
+## Migrations
+
+- Change the Drizzle schema in `apps/api/src/infrastructure/db/schema/`, then
+  `pnpm db:generate` and review the generated SQL before committing.
+- `pnpm db:migrate` applies pending migrations using `DATABASE_URL_UNPOOLED`.
+  Migrations never run at server startup.
+
+## Resetting the dev database
+
+Reset the Neon branch to an empty state with `neon branches reset`, or drop
+individual schemas. Then run `pnpm db:migrate` again.
