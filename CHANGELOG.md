@@ -6,3 +6,4 @@
   project `CLAUDE.md`.
 - Dropped Docker for local development in favor of a hosted dev database
   (ADR 0009).
+- Linked the Neon dev project; standardized on PostgreSQL 18 (ADR 0010).
