@@ -54,7 +54,8 @@ A **modular monolith** in a pnpm workspaces monorepo (ADR 0001, 0002):
 - **Files** in Cloudflare R2, served only via signed, time-limited URLs.
 - **Hosting:** Railway (API + Postgres), one deployment (ADR 0003).
 - **Local development:** no Docker. Apps run directly on the machine against a
-  hosted dev/test Postgres (`DATABASE_URL` in `.env`, never production).
+  hosted dev/test Postgres on Neon (`DATABASE_URL` in `.env`, never
+  production).
   Integration tests roll back or drop their own data. CI uses a Postgres
   service container (ADR 0009).
 
@@ -126,7 +127,8 @@ Every feature goes **spec → plan → build → verify → docs**:
 
 - Code, identifiers, comments, commit messages and docs are in English.
 - **Git:** a branch per feature, PR into `main`. Commit on your own after each
-  verified step — don't wait to be asked. Remote: GitHub.
+  verified step — don't wait to be asked. **Never push** unless the user
+  asks for that push. Remote: GitHub.
 - Secrets live in `.env` (gitignored). Commit only `.env.example` with blank
   values. Never put credentials in docs, commits or Claude settings.
 - Schema changes are a Drizzle-generated migration, reviewed before commit,

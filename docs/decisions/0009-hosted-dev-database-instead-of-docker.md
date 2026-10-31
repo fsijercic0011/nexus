@@ -14,7 +14,9 @@ project that is more setup than it is worth.
 - **No Docker for local development.** The API and web app run directly on the
   machine (`pnpm dev`) and connect to a **hosted development/test Postgres**
   via `DATABASE_URL` in `.env`. It is a separate database from production and
-  never shares data with it.
+  never shares data with it. The provider is **Neon** (free tier); production
+  stays on Railway. Migrations use Neon's direct connection string, not the
+  pooled one.
 - **Tests must not depend on leftover state.** Integration tests run each test
   in a transaction that is rolled back, or in a per-run schema that is dropped
   afterwards, so a shared remote database stays clean.
