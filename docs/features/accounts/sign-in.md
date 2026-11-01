@@ -22,6 +22,20 @@ Removing an email from the list later does not lock out an existing account.
   page knows whether to show the button. Google links to an existing account
   with the same email.
 
+## Two-factor (TOTP)
+
+Optional, per user, using Better Auth's two-factor plugin (issuer "NEXUS").
+
+- **Enable:** `POST /api/auth/two-factor/enable` with the password returns an
+  `otpauth://` URI (shown as a QR code) and 10 backup codes; it takes effect
+  once `POST /api/auth/two-factor/verify-totp` confirms a code from the app.
+- **Sign-in:** a password sign-in of a user with 2FA returns
+  `{ "twoFactorRedirect": true }` and no session; the session starts after
+  `verify-totp` or `verify-backup-code`. Each backup code works once.
+- **Disable:** `POST /api/auth/two-factor/disable` with the password.
+- **Google sign-ins aren't challenged**; the Google account's own 2-step
+  verification applies ([ADR 0013](../../decisions/0013-two-factor-for-password-sign-in-only.md)).
+
 Sessions are Better Auth cookie sessions: `HttpOnly`, `SameSite=Lax`, and
 `Secure` in production.
 
@@ -37,5 +51,5 @@ and sets it to the request's address. On Railway (`RAILWAY_ENVIRONMENT_ID` or
 
 ## Tests
 
-`apps/api/test/auth.test.ts` and `google.test.ts` (real database), `allowlist.test.ts`,
+`apps/api/test/auth.test.ts`, `google.test.ts` and `two-factor.test.ts` (real database), `allowlist.test.ts`,
 `client-address.test.ts`, `config.test.ts`.

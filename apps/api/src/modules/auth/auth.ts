@@ -1,6 +1,7 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { APIError } from "better-auth/api";
+import { twoFactor } from "better-auth/plugins";
 import { uuidv7 } from "uuidv7";
 import type { AppConfig } from "../../infrastructure/config.js";
 import type { Database } from "../../infrastructure/db/client.js";
@@ -39,6 +40,9 @@ export function createAuth(database: Database, config: AppConfig) {
       // email) instead of failing as a duplicate.
       accountLinking: { enabled: true, trustedProviders: ["google"] },
     },
+    // TOTP for password sign-in. Google sign-ins aren't challenged; the
+    // Google account's own 2-step verification applies (ADR 0013).
+    plugins: [twoFactor({ issuer: "NEXUS" })],
     rateLimit: { enabled: true },
     advanced: {
       database: { generateId: () => uuidv7() },

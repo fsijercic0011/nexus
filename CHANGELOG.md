@@ -13,6 +13,8 @@
   client address (Railway's `X-Real-IP` only on Railway).
 - Added optional Google sign-in (shown only when configured) and a Google
   OAuth setup guide.
+- Added optional TOTP two-factor with backup codes for password sign-in
+  (ADR 0013).
 
 ## 2026-10-31
 

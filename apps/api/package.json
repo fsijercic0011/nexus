@@ -24,6 +24,7 @@
   "devDependencies": {
     "@types/node": "^26.6.6",
     "drizzle-kit": "^0.31.11",
+    "otpauth": "^9.5.2",
     "tsx": "^4.23.15",
     "vitest": "^5.0.5"
   }

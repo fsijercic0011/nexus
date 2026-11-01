@@ -2,13 +2,14 @@ import { sql } from "drizzle-orm";
 import {
   boolean,
   index,
+  integer,
   pgTable,
   text,
   timestamp,
   uuid,
 } from "drizzle-orm/pg-core";
 
-// Better Auth's core tables (users, sessions, accounts, verifications), in
+// Better Auth's tables (users, sessions, accounts, verifications, two_factors), in
 // NEXUS style: UUIDv7 ids, snake_case columns, timestamptz. Better Auth reads
 // them through the Drizzle adapter by these export names (usePlural).
 
@@ -27,6 +28,7 @@ export const users = pgTable("users", {
   email: text("email").notNull().unique(),
   emailVerified: boolean("email_verified").notNull().default(false),
   image: text("image"),
+  twoFactorEnabled: boolean("two_factor_enabled").default(false),
   createdAt: createdAt(),
   updatedAt: updatedAt(),
 });
@@ -85,4 +87,25 @@ export const verifications = pgTable(
     updatedAt: updatedAt(),
   },
   (table) => [index("verifications_identifier_idx").on(table.identifier)],
+);
+
+/** Better Auth two-factor plugin: one TOTP secret and backup codes per user
+ * (both stored encrypted by Better Auth). */
+export const twoFactors = pgTable(
+  "two_factors",
+  {
+    id: id(),
+    secret: text("secret").notNull(),
+    backupCodes: text("backup_codes").notNull(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    verified: boolean("verified").default(true),
+    failedVerificationCount: integer("failed_verification_count").default(0),
+    lockedUntil: timestamp("locked_until", { withTimezone: true }),
+  },
+  (table) => [
+    index("two_factors_user_id_idx").on(table.userId),
+    index("two_factors_secret_idx").on(table.secret),
+  ],
 );
