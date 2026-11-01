@@ -21,6 +21,8 @@
   `PATCH /api/household`. Sharing moved out of v0.1 (ADR 0014).
 - Added `pnpm --filter @nexus/api reset-password <email>` for forgotten
   passwords until email delivery exists.
+- Added the sign-in page (sign in, create account, Google when configured,
+  two-factor step) and the session guard around the app shell.
 
 ## 2026-10-31
 

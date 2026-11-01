@@ -20,3 +20,10 @@ window.matchMedia = (query: string) =>
     removeListener: () => {},
     dispatchEvent: () => false,
   }) as MediaQueryList;
+
+// jsdom has no ResizeObserver (used by Segmented to place its indicator).
+globalThis.ResizeObserver ??= class {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+} as unknown as typeof ResizeObserver;

@@ -2,6 +2,28 @@
 
 How the owner gets into NEXUS. Code: `apps/api/src/modules/auth`.
 
+## Screens
+
+`/sign-in` (`apps/web/src/features/auth/SignInPage.tsx`):
+
+- A switch between **I have an account** and **Create account** (name,
+  email, password of at least 8 characters). The email is trimmed before it
+  is sent.
+- **Continue with Google** appears only when `GET /api/auth-providers` says
+  Google is configured.
+- Errors: "That email and password don't match.", "This account can't be
+  created." (not on the allowlist), "Too many attempts…" (rate limited).
+- With two-factor on, a password sign-in continues to a **Two-factor
+  check** (`TwoFactorStep`): a 6-digit code from the authenticator app, or
+  "Use a backup code". A wrong code shows "That code didn't work. Try
+  again."
+- After signing in NEXUS opens the page the visitor was headed for
+  (`?next=`, same-site paths only), else Home.
+
+Every app page sits behind `RequireSession`: without a session it sends the
+visitor to `/sign-in?next=<path>`, and when any API call later answers 401
+(signed out elsewhere, session expired) it does the same.
+
 ## Who can create an account
 
 Sign-up is closed. Only emails listed in `SIGNUP_ALLOWED_EMAILS` (comma
