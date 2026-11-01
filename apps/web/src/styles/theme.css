@@ -215,3 +215,11 @@
     transition: none;
   }
 }
+
+/* Small uppercase-weight label above a card or section. */
+@utility eyebrow {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  color: var(--muted-foreground);
+}

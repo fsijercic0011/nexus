@@ -1,6 +1,6 @@
 import { healthResponseSchema } from "@nexus/shared";
 import { useQuery } from "@tanstack/react-query";
-import { getJson } from "../../lib/api";
+import { getJson } from "@/lib/api";
 
 export function HealthStatus() {
   const health = useQuery({
@@ -16,7 +16,7 @@ export function HealthStatus() {
   }
 
   return (
-    <p role="status" className="text-sm text-muted">
+    <p role="status" className="text-sm text-muted-foreground">
       {text}
     </p>
   );

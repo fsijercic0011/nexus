@@ -68,7 +68,7 @@ export function ResponsiveDialog({
         >
           <div className="flex items-start gap-4 border-b border-border p-4 md:p-6">
             <div className="min-w-0 flex-1">
-              <Dialog.Title className="font-display text-xl font-semibold">
+              <Dialog.Title className="text-xl font-semibold">
                 {title}
               </Dialog.Title>
               {description && (
