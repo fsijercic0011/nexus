@@ -19,6 +19,8 @@
   the entity registry with event history, the audit log, and repeat-safe
   writes via `Idempotency-Key`; `GET /api/me`, `PATCH /api/me/profile`,
   `PATCH /api/household`. Sharing moved out of v0.1 (ADR 0014).
+- Added `pnpm --filter @nexus/api reset-password <email>` for forgotten
+  passwords until email delivery exists.
 
 ## 2026-10-31
 
