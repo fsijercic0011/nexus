@@ -1,2 +1,2 @@
-// Drizzle table definitions. Tables arrive with the data-model plan.
-export {};
+// Drizzle table definitions.
+export * from "./auth.js";

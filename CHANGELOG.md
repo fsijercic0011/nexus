@@ -8,6 +8,9 @@
   header with ⓘ) and documented the design system.
 - Added the app shell: sidebar on desktop, bottom tab bar on phones, Home
   and Settings pages; e2e runs on desktop and phone viewports.
+- Added email + password sign-in with Better Auth; only emails in
+  `SIGNUP_ALLOWED_EMAILS` can create an account; rate limiting uses the real
+  client address (Railway's `X-Real-IP` only on Railway).
 
 ## 2026-10-31
 

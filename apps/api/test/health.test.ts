@@ -1,20 +1,18 @@
 import { describe, expect, it } from "vitest";
 import { buildApp } from "../src/app.js";
-import type { AppConfig } from "../src/infrastructure/config.js";
 import { checkDatabase } from "../src/infrastructure/db/client.js";
+import { testConfig, unusedDatabase } from "./test-config.js";
 import { createTestDatabase } from "./test-database.js";
 
-const config: AppConfig = {
-  nodeEnv: "test",
-  host: "127.0.0.1",
-  port: 0,
-  databaseUrl: "postgres://unused",
-  webDistDir: undefined,
-};
+const config = testConfig();
 
 describe("GET /api/health", () => {
   it("reports ok when the database answers", async () => {
-    const app = await buildApp({ config, checkDatabase: async () => true });
+    const app = await buildApp({
+      config,
+      database: unusedDatabase(),
+      checkDatabase: async () => true,
+    });
     const response = await app.inject({ method: "GET", url: "/api/health" });
     expect(response.statusCode).toBe(200);
     expect(response.json()).toEqual({ status: "ok", database: "ok" });
@@ -24,6 +22,7 @@ describe("GET /api/health", () => {
   it("reports degraded when the database check throws", async () => {
     const app = await buildApp({
       config,
+      database: unusedDatabase(),
       checkDatabase: async () => {
         throw new Error("connection refused");
       },
@@ -40,6 +39,7 @@ describe("GET /api/health", () => {
   it("does not hang on a stuck database", async () => {
     const app = await buildApp({
       config,
+      database: unusedDatabase(),
       checkDatabase: () => new Promise<boolean>(() => {}),
     });
     const started = Date.now();
@@ -57,6 +57,7 @@ describe.skipIf(!process.env.DATABASE_URL_UNPOOLED)(
       const { database, cleanup } = await createTestDatabase();
       const app = await buildApp({
         config,
+        database,
         checkDatabase: () => checkDatabase(database),
       });
       try {

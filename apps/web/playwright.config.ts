@@ -17,7 +17,13 @@ export default defineConfig({
     command: "pnpm --filter @nexus/api start",
     // Wait on the page, not /api/health: readiness must not depend on the database.
     url: `http://127.0.0.1:${port}/`,
-    env: { PORT: String(port), WEB_DIST_DIR: webDistDir },
+    env: {
+      PORT: String(port),
+      WEB_DIST_DIR: webDistDir,
+      // A fixed, non-secret value: e2e runs against throwaway data only.
+      BETTER_AUTH_SECRET: "e2e-only-secret-e2e-only-secret-0000",
+      BETTER_AUTH_URL: `http://127.0.0.1:${port}`,
+    },
     reuseExistingServer: false,
     timeout: 60_000,
   },

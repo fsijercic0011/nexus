@@ -12,6 +12,19 @@ The apps run directly on your machine against a hosted Neon dev database
   used by the app) and `DATABASE_URL_UNPOOLED` (direct, used by migrations and
   tests). See `.env.example` for every variable.
 
+## Sign-in settings
+
+Add these to `.env.local` (all listed in `.env.example`):
+
+- `BETTER_AUTH_SECRET` — signs sessions; at least 32 characters. Generate
+  one with `openssl rand -base64 32`.
+- `BETTER_AUTH_URL=http://localhost:5173` — the address you open NEXUS on.
+  Required in production.
+- `SIGNUP_ALLOWED_EMAILS` — comma-separated emails that may create an
+  account. Leave it blank and nobody can sign up.
+- `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` — optional; both or neither.
+  See [Google OAuth setup](google-oauth-setup.md).
+
 ## First run
 
 ```sh
