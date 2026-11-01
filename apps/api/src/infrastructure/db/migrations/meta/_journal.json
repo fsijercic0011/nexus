@@ -22,6 +22,20 @@
       "when": 1793558763109,
       "tag": "0002_two_factor",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1793558926366,
+      "tag": "0003_households",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1793558928102,
+      "tag": "0004_household_entity_fk",
+      "breakpoints": true
     }
   ]
 }

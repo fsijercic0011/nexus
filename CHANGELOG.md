@@ -15,6 +15,10 @@
   OAuth setup guide.
 - Added optional TOTP two-factor with backup codes for password sign-in
   (ADR 0013).
+- Added households (created on first sign-in), role and visibility checks,
+  the entity registry with event history, the audit log, and repeat-safe
+  writes via `Idempotency-Key`; `GET /api/me`, `PATCH /api/me/profile`,
+  `PATCH /api/household`. Sharing moved out of v0.1 (ADR 0014).
 
 ## 2026-10-31
 

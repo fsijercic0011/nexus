@@ -7,6 +7,7 @@ import type { AppConfig } from "../../infrastructure/config.js";
 import type { Database } from "../../infrastructure/db/client.js";
 import * as schema from "../../infrastructure/db/schema/index.js";
 import { isSignupAllowed, normalizeEmail } from "./allowlist.js";
+import { auditAfterHook, auditTwoFactorChange } from "./audit-hooks.js";
 
 /** The request header the auth route sets to the client's address (and
  * strips from incoming requests), so Better Auth rate-limits by the real
@@ -49,8 +50,10 @@ export function createAuth(database: Database, config: AppConfig) {
       ipAddress: { ipAddressHeaders: [CLIENT_ADDRESS_HEADER] },
       useSecureCookies: config.nodeEnv === "production",
     },
+    hooks: { after: auditAfterHook(database.db) },
     databaseHooks: {
       user: {
+        update: { after: auditTwoFactorChange(database.db) },
         create: {
           // Every way of creating an account (password, Google) passes
           // through here, so the allowlist can't be bypassed.

@@ -5,6 +5,11 @@ ships.
 
 ## v0.2 and after the core MVP
 
+- **Sharing with friends** (ADR 0014) — invite links, member management,
+  guests (read-only access to shared records) and switching between
+  households. Ideas: let guests add to the shopping list; a manual "I'm
+  home" switch.
+
 - **Automation engine** — trigger → conditions → actions, with automatic /
   approval / suggestion modes and execution logs. Actions that control a
   device, spend money or delete data require approval.
@@ -15,7 +20,7 @@ ships.
 - **Printable QR label sheets** — A4 sticker sheets for containers and items
   (no label printer).
 - **Email delivery** for invitations and notifications (free-tier provider).
-- **Guest invitations** with time-limited access.
+- **Time-limited guest access** (after sharing).
 - **Passkeys.**
 - **Postgres Row-Level Security** as defense in depth.
 
