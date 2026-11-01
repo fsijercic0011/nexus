@@ -1,8 +1,8 @@
 import { useSyncExternalStore } from "react";
 
-/** The phone breakpoint: below Tailwind's `md` (768px), where MobileNav
+/** The phone breakpoint: below Tailwind's `md` (768px), where BottomNav
  * replaces the sidebar. Keep in sync with the `max-width: 767px` rules in
- * index.css. */
+ * styles/theme.css. */
 export const MOBILE_QUERY = "(max-width: 767px)";
 
 function subscribe(onChange: () => void) {

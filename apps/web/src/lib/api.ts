@@ -27,3 +27,15 @@ export async function getJson<T>(path: string, schema: ZodType<T>): Promise<T> {
   }
   return parsed.data;
 }
+
+/** A readable message for an error thrown by an API call or a form save. */
+export function errorMessage(error: unknown): string {
+  if (error instanceof ApiError) {
+    if (error.status === 401) return "Your session has ended. Sign in again.";
+    if (error.status === 403) return "You don't have permission to do that.";
+    if (error.status >= 500)
+      return "Something went wrong. Please try again later.";
+  }
+  if (error instanceof Error && error.message) return error.message;
+  return "Something went wrong. Please try again later.";
+}

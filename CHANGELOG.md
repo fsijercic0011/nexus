@@ -4,6 +4,8 @@
 
 - Ported the shared UI primitives from Imperior with the Graphite dark theme
   (ADR 0012).
+- Ported the composite components (dialogs, forms, tables, filters, page
+  header with ⓘ) and documented the design system.
 
 ## 2026-10-31
 
