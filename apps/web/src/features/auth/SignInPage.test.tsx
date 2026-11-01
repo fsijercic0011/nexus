@@ -15,13 +15,13 @@ const auth = vi.hoisted(() => ({
 }));
 vi.mock("@/lib/auth-client", () => ({ authClient: auth }));
 
-function renderPage() {
+function renderPage(initialEntry = "/sign-in") {
   const router = createMemoryRouter(
     [
       { path: "/sign-in", element: <SignInPage /> },
       { path: "/", element: <p>home page</p> },
     ],
-    { initialEntries: ["/sign-in"] },
+    { initialEntries: [initialEntry] },
   );
   render(
     <QueryClientProvider client={new QueryClient()}>
@@ -50,6 +50,24 @@ describe("SignInPage", () => {
     ).toBeInTheDocument();
     await screen.findByRole("button", { name: "Sign in" });
     expect(screen.queryByRole("button", { name: /Google/ })).toBeNull();
+  });
+
+  it("explains a Google sign-in that ended in an error", async () => {
+    renderPage("/sign-in?error=account_not_linked");
+    expect(
+      await screen.findByText(
+        "This email already has a password account. Sign in with your password.",
+      ),
+    ).toBeInTheDocument();
+  });
+
+  it("explains any other Google failure, including an email that isn't allowed", async () => {
+    renderPage("/sign-in?error=unable_to_create_user");
+    expect(
+      await screen.findByText(
+        "Google sign-in didn't work. Only allowed emails can create an account.",
+      ),
+    ).toBeInTheDocument();
   });
 
   it("offers Google when it's configured", async () => {

@@ -4,6 +4,7 @@ import type { AppConfig } from "./infrastructure/config.js";
 import { checkDatabase, type Database } from "./infrastructure/db/client.js";
 import { registerErrorHandler } from "./infrastructure/errors.js";
 import { registerIdempotency } from "./infrastructure/idempotency.js";
+import { serializeRequest } from "./infrastructure/logging.js";
 import {
   registerJsonNotFound,
   registerWebApp,
@@ -35,7 +36,10 @@ export async function buildApp(
 ): Promise<FastifyInstance> {
   const { config, database } = options;
   const app = Fastify({
-    logger: config.nodeEnv === "test" ? false : { level: "info" },
+    logger:
+      config.nodeEnv === "test"
+        ? false
+        : { level: "info", serializers: { req: serializeRequest } },
   });
   registerClientAddress(app, { trustRailwayProxy: config.trustRailwayProxy });
   const auth = createAuth(database, config);

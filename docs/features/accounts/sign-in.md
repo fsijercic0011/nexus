@@ -41,8 +41,13 @@ Removing an email from the list later does not lock out an existing account.
 - **Google** — only when `GOOGLE_CLIENT_ID`/`GOOGLE_CLIENT_SECRET` are set
   ([integration](../../integrations/google-oauth.md)). `GET
   /api/auth-providers` returns `{ "google": true | false }` so the sign-in
-  page knows whether to show the button. Google links to an existing account
-  with the same email.
+  page knows whether to show the button. Google is not linked to an existing
+  password account with the same email (NEXUS can't verify emails yet, and
+  Better Auth links only verified ones): such a Google sign-in comes back to
+  `/sign-in` with "This email already has a password account. Sign in with
+  your password." Use one method per email. Other Google failures, such as
+  an email not on the allowlist, show "Google sign-in didn't work. Only
+  allowed emails can create an account."
 
 ## Two-factor (TOTP)
 

@@ -11,8 +11,10 @@
 - **Callback:** `<BETTER_AUTH_URL>/api/auth/callback/google`.
 - **Allowlist:** a Google sign-up goes through the same allowlist hook as a
   password sign-up.
-- **Account linking:** Google links to an existing account with the same
-  email (`trustedProviders: ["google"]`).
+- **Account linking:** none. A Google sign-in for an email that already has a
+  password account is refused (`account_not_linked`), because NEXUS can't
+  verify emails yet and linking an unverified account would let whoever
+  registered the email first share it.
 - **Two-factor:** Google sign-ins aren't challenged for NEXUS's TOTP; the
   Google account's own 2-step verification applies (ADR 0013).
 - **Cost:** free.

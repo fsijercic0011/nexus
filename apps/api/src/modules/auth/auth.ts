@@ -36,11 +36,10 @@ export function createAuth(database: Database, config: AppConfig) {
           },
         }
       : {},
-    account: {
-      // Google signs in to the owner's existing password account (same
-      // email) instead of failing as a duplicate.
-      accountLinking: { enabled: true, trustedProviders: ["google"] },
-    },
+    // No account linking: Better Auth only links Google to an account whose
+    // email is verified, and NEXUS can't verify emails yet. So an email that
+    // already has a password account must keep signing in with the password
+    // (otherwise whoever registered the email first would share the account).
     // TOTP for password sign-in. Google sign-ins aren't challenged; the
     // Google account's own 2-step verification applies (ADR 0013).
     plugins: [twoFactor({ issuer: "NEXUS" })],

@@ -1,5 +1,5 @@
 import { meSchema } from "@nexus/shared";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import type { FastifyInstance } from "fastify";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { buildApp } from "../src/app.js";
@@ -7,6 +7,7 @@ import {
   auditLogs,
   events,
   householdMembers,
+  sessions,
 } from "../src/infrastructure/db/schema/index.js";
 import { AuthTestClient } from "./auth-client.js";
 import { testConfig } from "./test-config.js";
@@ -47,6 +48,20 @@ describe.skipIf(!process.env.DATABASE_URL_UNPOOLED)(
       expect(me.user.twoFactorEnabled).toBe(false);
       expect(me.household.name).toBe("My household");
       expect(me.role).toBe("admin");
+    });
+
+    it("extends an ageing session and sends the refreshed cookie", async () => {
+      await testDb.database.db
+        .update(sessions)
+        .set({ expiresAt: sql`now() + interval '3 days'` });
+      const response = await owner.request("GET", "/api/me");
+      expect(response.statusCode).toBe(200);
+      const cookies = [response.headers["set-cookie"] ?? []].flat().join("; ");
+      expect(cookies).toContain("better-auth.session_token=");
+      const [row] = await testDb.database.db.select().from(sessions);
+      expect(row?.expiresAt.getTime()).toBeGreaterThan(
+        Date.now() + 6 * 24 * 3600 * 1000,
+      );
     });
 
     it("answers 401 without a session", async () => {

@@ -26,6 +26,10 @@
 - Added the Settings page (profile, password, two-factor setup with QR code
   and backup codes, sign out / sign out everywhere, household name); e2e now
   runs the signed-in flow on its own throwaway database.
+- Fixed: sessions are now extended while in use (the refreshed cookie
+  reaches the browser); Google sign-in failures show a message; OAuth codes
+  no longer appear in request logs; Google is documented as not linking to
+  password accounts.
 
 ## 2026-10-31
 

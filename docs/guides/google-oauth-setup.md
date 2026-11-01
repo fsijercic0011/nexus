@@ -28,9 +28,11 @@ password sign-in still works. Google is free for this use.
 - Railway: add both as service variables, and set `BETTER_AUTH_URL` to
   `https://<your-railway-domain>`.
 
-Google can only sign in emails on `SIGNUP_ALLOWED_EMAILS` (or already
-existing accounts). If your Google email matches your password account, the
-two are linked and either method signs in to the same account.
+Google can only create accounts for emails on `SIGNUP_ALLOWED_EMAILS`.
+Pick one sign-in method per email: if you already created a password account
+with your Google email, Google sign-in for it is refused (NEXUS can't verify
+emails yet, so it doesn't link accounts). To use Google, create the account
+with Google in the first place.
 
 Keep 2-step verification on for your Google account: NEXUS's own TOTP code is
 asked only after a password sign-in (ADR 0013).

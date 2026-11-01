@@ -1,9 +1,11 @@
 import { authProvidersSchema } from "@nexus/shared";
+import { handleOAuthUserInfo } from "better-auth/oauth2";
 import { eq } from "drizzle-orm";
 import type { FastifyInstance } from "fastify";
 import { afterEach, describe, expect, it } from "vitest";
 import { buildApp } from "../src/app.js";
-import { users } from "../src/infrastructure/db/schema/index.js";
+import { accounts, users } from "../src/infrastructure/db/schema/index.js";
+import { AuthTestClient } from "./auth-client.js";
 import { nextTestAddress, testConfig, unusedDatabase } from "./test-config.js";
 import { createTestDatabase, type TestDatabase } from "./test-database.js";
 
@@ -103,6 +105,38 @@ describe.skipIf(!process.env.DATABASE_URL_UNPOOLED)(
         .from(users)
         .where(eq(users.email, "stranger@example.com"));
       expect(rows).toEqual([]);
+    });
+
+    it("doesn't link Google to an existing (unverified) password account", async () => {
+      testDb = await createTestDatabase();
+      app = await buildApp({
+        config: testConfig({ google }),
+        database: testDb.database,
+      });
+      await new AuthTestClient(app).signUp();
+      const context = await app.auth.$context;
+      const result = await handleOAuthUserInfo(
+        { context } as never,
+        {
+          userInfo: {
+            id: "google-sub",
+            email: "owner@example.com",
+            name: "Owner",
+            emailVerified: true,
+          },
+          account: {
+            providerId: "google",
+            accountId: "google-sub",
+            accessToken: "token",
+          },
+        } as never,
+      );
+      expect(result.error).toBe("account not linked");
+      const linked = await testDb.database.db
+        .select()
+        .from(accounts)
+        .where(eq(accounts.providerId, "google"));
+      expect(linked).toEqual([]);
     });
 
     it("creates an allowlisted Google user", async () => {

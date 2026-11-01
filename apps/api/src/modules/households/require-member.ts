@@ -20,10 +20,15 @@ export function requireMember(
   options: { auth: Auth; db: Db },
 ): void {
   app.decorateRequest("member", null as unknown as MemberContext);
-  app.addHook("preHandler", async (request) => {
-    const session = await options.auth.api.getSession({
+  app.addHook("preHandler", async (request, reply) => {
+    const { headers, response: session } = await options.auth.api.getSession({
       headers: fromNodeHeaders(request.headers),
+      returnHeaders: true,
     });
+    // Better Auth extends an ageing session here; pass its refreshed cookie
+    // on, or the browser's copy would still expire on the original date.
+    const refreshed = headers.getSetCookie();
+    if (refreshed.length > 0) reply.header("set-cookie", refreshed);
     if (!session) {
       throw new ApiError(401, "unauthenticated", "Sign in to continue.");
     }

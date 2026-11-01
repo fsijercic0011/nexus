@@ -20,6 +20,15 @@ function safeNext(next: string | null): string {
   return next?.startsWith("/") && !next.startsWith("//") ? next : "/";
 }
 
+/** The message for a Google sign-in that came back with ?error=<code>. */
+function googleFailureMessage(code: string | null): string | null {
+  if (!code) return null;
+  if (code === "account_not_linked") {
+    return "This email already has a password account. Sign in with your password.";
+  }
+  return "Google sign-in didn't work. Only allowed emails can create an account.";
+}
+
 function failureMessage(
   mode: Mode,
   error: { status?: number; message?: string },
@@ -41,9 +50,11 @@ export function SignInPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [twoFactor, setTwoFactor] = useState(false);
   const [params] = useSearchParams();
+  const [error, setError] = useState<string | null>(() =>
+    googleFailureMessage(params.get("error")),
+  );
+  const [twoFactor, setTwoFactor] = useState(false);
   const navigate = useNavigate();
   const client = useQueryClient();
   const providers = useQuery({
