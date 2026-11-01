@@ -1,0 +1,83 @@
+# Sign-in
+
+How the owner gets into NEXUS. Code: `apps/api/src/modules/auth`.
+
+## Screens
+
+`/sign-in` (`apps/web/src/features/auth/SignInPage.tsx`):
+
+- A switch between **I have an account** and **Create account** (name,
+  email, password of at least 8 characters). The email is trimmed before it
+  is sent.
+- **Continue with Google** appears only when `GET /api/auth-providers` says
+  Google is configured.
+- Errors: "That email and password don't match.", "This account can't be
+  created." (not on the allowlist), "Too many attempts…" (rate limited).
+- With two-factor on, a password sign-in continues to a **Two-factor
+  check** (`TwoFactorStep`): a 6-digit code from the authenticator app, or
+  "Use a backup code". A wrong code shows "That code didn't work. Try
+  again."
+- After signing in NEXUS opens the page the visitor was headed for
+  (`?next=`, same-site paths only), else Home.
+
+Every app page sits behind `RequireSession`: without a session it sends the
+visitor to `/sign-in?next=<path>`, and when any API call later answers 401
+(signed out elsewhere, session expired) it does the same.
+
+## Who can create an account
+
+Sign-up is closed. Only emails listed in `SIGNUP_ALLOWED_EMAILS` (comma
+separated, case-insensitive) can create an account, by any method. The check
+runs in Better Auth's user-creation hook, which every sign-up path passes
+through. Any other email gets a 403 with "This account can't be created." and
+no account is stored. Emails are stored lower-cased; an email with
+surrounding spaces is rejected as invalid (the web form trims it first).
+Removing an email from the list later does not lock out an existing account.
+
+## Methods
+
+- **Email and password** — `POST /api/auth/sign-up/email`,
+  `POST /api/auth/sign-in/email`.
+- **Google** — only when `GOOGLE_CLIENT_ID`/`GOOGLE_CLIENT_SECRET` are set
+  ([integration](../../integrations/google-oauth.md)). `GET
+  /api/auth-providers` returns `{ "google": true | false }` so the sign-in
+  page knows whether to show the button. Google is not linked to an existing
+  password account with the same email (NEXUS can't verify emails yet, and
+  Better Auth links only verified ones): such a Google sign-in comes back to
+  `/sign-in` with "This email already has a password account. Sign in with
+  your password." Use one method per email. Other Google failures, such as
+  an email not on the allowlist, show "Google sign-in didn't work. Only
+  allowed emails can create an account."
+
+## Two-factor (TOTP)
+
+Optional, per user, using Better Auth's two-factor plugin (issuer "NEXUS").
+
+- **Enable:** `POST /api/auth/two-factor/enable` with the password returns an
+  `otpauth://` URI (shown as a QR code) and 10 backup codes; it takes effect
+  once `POST /api/auth/two-factor/verify-totp` confirms a code from the app.
+- **Sign-in:** a password sign-in of a user with 2FA returns
+  `{ "twoFactorRedirect": true }` and no session; the session starts after
+  `verify-totp` or `verify-backup-code`. Each backup code works once.
+- **Disable:** `POST /api/auth/two-factor/disable` with the password.
+- **Google sign-ins aren't challenged**; the Google account's own 2-step
+  verification applies ([ADR 0013](../../decisions/0013-two-factor-for-password-sign-in-only.md)).
+
+Sessions are Better Auth cookie sessions: `HttpOnly`, `SameSite=Lax`, and
+`Secure` in production.
+
+## Rate limiting and client address
+
+Better Auth rate-limits its endpoints per client address (for example a few
+password attempts per 10 seconds). `AUTH_RATE_LIMIT=off` turns this off for
+the e2e harness only; the API refuses to start with it in production. The address comes from the API, never from
+the client: the auth route strips any incoming `x-nexus-client-address` header
+and sets it to the request's address. On Railway (`RAILWAY_ENVIRONMENT_ID` or
+`RAILWAY_ENVIRONMENT` set) that is the edge's `X-Real-IP`; elsewhere
+`X-Real-IP` is ignored so a client can't pose as another address
+(`apps/api/src/infrastructure/client-address.ts`).
+
+## Tests
+
+`apps/api/test/auth.test.ts`, `google.test.ts` and `two-factor.test.ts` (real database), `allowlist.test.ts`,
+`client-address.test.ts`, `config.test.ts`.

@@ -9,3 +9,6 @@ dist/
 .neon
 playwright-report/
 test-results/
+
+# Brainstorming mockups
+.superpowers/

@@ -1,7 +1,7 @@
 import { fileURLToPath } from "node:url";
 import { buildApp } from "./app.js";
 import { loadConfig } from "./infrastructure/config.js";
-import { checkDatabase, createDatabase } from "./infrastructure/db/client.js";
+import { createDatabase } from "./infrastructure/db/client.js";
 import { loadEnvFileIfPresent } from "./infrastructure/env-file.js";
 
 loadEnvFileIfPresent(
@@ -10,10 +10,7 @@ loadEnvFileIfPresent(
 
 const config = loadConfig(process.env);
 const database = createDatabase(config.databaseUrl);
-const app = await buildApp({
-  config,
-  checkDatabase: () => checkDatabase(database),
-});
+const app = await buildApp({ config, database });
 
 for (const signal of ["SIGINT", "SIGTERM"] as const) {
   process.once(signal, async () => {

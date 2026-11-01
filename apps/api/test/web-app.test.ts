@@ -4,6 +4,7 @@ import { join } from "node:path";
 import type { FastifyInstance } from "fastify";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { buildApp } from "../src/app.js";
+import { testConfig, unusedDatabase } from "./test-config.js";
 
 let distDir: string;
 let app: FastifyInstance;
@@ -17,13 +18,8 @@ beforeAll(async () => {
   mkdirSync(join(distDir, "assets"));
   writeFileSync(join(distDir, "assets", "app.js"), "console.log('app');");
   app = await buildApp({
-    config: {
-      nodeEnv: "test",
-      host: "127.0.0.1",
-      port: 0,
-      databaseUrl: "postgres://unused",
-      webDistDir: distDir,
-    },
+    config: testConfig({ webDistDir: distDir }),
+    database: unusedDatabase(),
     checkDatabase: async () => true,
   });
 });
@@ -77,13 +73,10 @@ describe("misconfigured web app", () => {
   it("fails startup when WEB_DIST_DIR has no index.html", async () => {
     await expect(
       buildApp({
-        config: {
-          nodeEnv: "test",
-          host: "127.0.0.1",
-          port: 0,
-          databaseUrl: "postgres://unused",
+        config: testConfig({
           webDistDir: join(tmpdir(), "nexus-missing-dist"),
-        },
+        }),
+        database: unusedDatabase(),
         checkDatabase: async () => true,
       }),
     ).rejects.toThrow(/WEB_DIST_DIR/);
