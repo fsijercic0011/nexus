@@ -26,6 +26,19 @@ export function createAuth(database: Database, config: AppConfig) {
       usePlural: true,
     }),
     emailAndPassword: { enabled: true },
+    socialProviders: config.google
+      ? {
+          google: {
+            clientId: config.google.clientId,
+            clientSecret: config.google.clientSecret,
+          },
+        }
+      : {},
+    account: {
+      // Google signs in to the owner's existing password account (same
+      // email) instead of failing as a duplicate.
+      accountLinking: { enabled: true, trustedProviders: ["google"] },
+    },
     rateLimit: { enabled: true },
     advanced: {
       database: { generateId: () => uuidv7() },

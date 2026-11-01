@@ -11,6 +11,8 @@
 - Added email + password sign-in with Better Auth; only emails in
   `SIGNUP_ALLOWED_EMAILS` can create an account; rate limiting uses the real
   client address (Railway's `X-Real-IP` only on Railway).
+- Added optional Google sign-in (shown only when configured) and a Google
+  OAuth setup guide.
 
 ## 2026-10-31
 

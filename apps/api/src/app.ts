@@ -7,6 +7,7 @@ import {
   registerWebApp,
 } from "./infrastructure/web-app.js";
 import { type Auth, createAuth } from "./modules/auth/auth.js";
+import { authProviderRoutes } from "./modules/auth/providers.js";
 import { authRoutes } from "./modules/auth/routes.js";
 import { healthRoutes } from "./modules/health/routes.js";
 
@@ -42,6 +43,7 @@ export async function buildApp(
         checkDatabase: options.checkDatabase ?? (() => checkDatabase(database)),
       });
       await api.register(authRoutes, { auth, origin: config.authUrl });
+      await api.register(authProviderRoutes, { google: !!config.google });
     },
     { prefix: "/api" },
   );

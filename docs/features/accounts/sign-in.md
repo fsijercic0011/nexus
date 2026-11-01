@@ -16,6 +16,11 @@ Removing an email from the list later does not lock out an existing account.
 
 - **Email and password** — `POST /api/auth/sign-up/email`,
   `POST /api/auth/sign-in/email`.
+- **Google** — only when `GOOGLE_CLIENT_ID`/`GOOGLE_CLIENT_SECRET` are set
+  ([integration](../../integrations/google-oauth.md)). `GET
+  /api/auth-providers` returns `{ "google": true | false }` so the sign-in
+  page knows whether to show the button. Google links to an existing account
+  with the same email.
 
 Sessions are Better Auth cookie sessions: `HttpOnly`, `SameSite=Lax`, and
 `Secure` in production.
@@ -32,5 +37,5 @@ and sets it to the request's address. On Railway (`RAILWAY_ENVIRONMENT_ID` or
 
 ## Tests
 
-`apps/api/test/auth.test.ts` (real database), `allowlist.test.ts`,
+`apps/api/test/auth.test.ts` and `google.test.ts` (real database), `allowlist.test.ts`,
 `client-address.test.ts`, `config.test.ts`.
