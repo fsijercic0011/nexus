@@ -19,6 +19,7 @@ describe("loadConfig", () => {
       signupAllowedEmails: [],
       google: undefined,
       trustRailwayProxy: false,
+      authRateLimit: true,
     });
   });
 
@@ -142,5 +143,34 @@ describe("auth configuration", () => {
       loadConfig({ ...base, RAILWAY_ENVIRONMENT: "production" })
         .trustRailwayProxy,
     ).toBe(true);
+  });
+});
+
+describe("auth rate limiting", () => {
+  const base = {
+    DATABASE_URL: "postgres://u:p@h/db",
+    BETTER_AUTH_SECRET: "x".repeat(32),
+  };
+
+  it("is on by default", () => {
+    expect(loadConfig(base).authRateLimit).toBe(true);
+  });
+
+  it("can be turned off outside production (e2e)", () => {
+    expect(
+      loadConfig({ ...base, NODE_ENV: "test", AUTH_RATE_LIMIT: "off" })
+        .authRateLimit,
+    ).toBe(false);
+  });
+
+  it("can't be turned off in production", () => {
+    expect(() =>
+      loadConfig({
+        ...base,
+        NODE_ENV: "production",
+        BETTER_AUTH_URL: "https://nexus.example.com",
+        AUTH_RATE_LIMIT: "off",
+      }),
+    ).toThrow(/AUTH_RATE_LIMIT/);
   });
 });

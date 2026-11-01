@@ -53,10 +53,17 @@ are more than an hour old (ADR 0011).
 
 ## End-to-end tests
 
-`pnpm e2e` runs the Playwright smoke tests in `apps/web/e2e` against the
-**built** app: it starts the compiled API on port 3100 serving
-`apps/web/dist`. Run `pnpm build` first. Install the browser once with
+`pnpm e2e` runs the Playwright tests in `apps/web/e2e` against the **built**
+app, on a desktop and a phone (Pixel 7) viewport. Run `pnpm build` first.
+Install the browser once with
 `pnpm --filter @nexus/web exec playwright install chromium`.
+
+The global setup (`apps/web/e2e/global-setup.ts`) creates its own throwaway
+`test_*` database (`apps/api/test/e2e-database.ts`), starts the compiled API
+on port 3100 against it with fixed e2e-only auth settings (allowlist
+`owner+desktop@nexus.test`, `owner+mobile@nexus.test`; `AUTH_RATE_LIMIT=off`,
+which the API refuses in production), and drops the database afterwards. It
+needs `DATABASE_URL_UNPOOLED` and never touches the dev database's data.
 
 ## Continuous integration
 

@@ -44,7 +44,7 @@ export function createAuth(database: Database, config: AppConfig) {
     // TOTP for password sign-in. Google sign-ins aren't challenged; the
     // Google account's own 2-step verification applies (ADR 0013).
     plugins: [twoFactor({ issuer: "NEXUS" })],
-    rateLimit: { enabled: true },
+    rateLimit: { enabled: config.authRateLimit },
     advanced: {
       database: { generateId: () => uuidv7() },
       ipAddress: { ipAddressHeaders: [CLIENT_ADDRESS_HEADER] },

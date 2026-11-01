@@ -64,7 +64,8 @@ Sessions are Better Auth cookie sessions: `HttpOnly`, `SameSite=Lax`, and
 ## Rate limiting and client address
 
 Better Auth rate-limits its endpoints per client address (for example a few
-password attempts per 10 seconds). The address comes from the API, never from
+password attempts per 10 seconds). `AUTH_RATE_LIMIT=off` turns this off for
+the e2e harness only; the API refuses to start with it in production. The address comes from the API, never from
 the client: the auth route strips any incoming `x-nexus-client-address` header
 and sets it to the request's address. On Railway (`RAILWAY_ENVIRONMENT_ID` or
 `RAILWAY_ENVIRONMENT` set) that is the edge's `X-Real-IP`; elsewhere

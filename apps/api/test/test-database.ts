@@ -80,3 +80,21 @@ export async function pruneStaleTestDatabases(
   }
   return stale;
 }
+
+/** Drops one `test_*` database by name (used by the e2e harness). */
+export async function dropTestDatabase(name: string): Promise<void> {
+  assertNotProduction();
+  if (!TEST_DATABASE.test(name)) {
+    throw new Error("Refusing to drop a database that isn't a test database");
+  }
+  const url = parseDatabaseUrl(
+    "DATABASE_URL_UNPOOLED",
+    process.env.DATABASE_URL_UNPOOLED,
+  );
+  const admin = createDatabase(url);
+  try {
+    await admin.sql`drop database if exists ${admin.sql(name)} with (force)`;
+  } finally {
+    await admin.close();
+  }
+}

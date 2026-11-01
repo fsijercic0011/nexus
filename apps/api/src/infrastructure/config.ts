@@ -16,6 +16,9 @@ export type AppConfig = {
   google: { clientId: string; clientSecret: string } | undefined;
   /** On Railway, trust the edge's X-Real-IP header for the client address. */
   trustRailwayProxy: boolean;
+  /** AUTH_RATE_LIMIT=off disables sign-in rate limiting; e2e only, refused
+   * in production. */
+  authRateLimit: boolean;
 };
 
 export class ConfigError extends Error {
@@ -68,6 +71,7 @@ const envSchema = z.object({
   GOOGLE_CLIENT_SECRET: z.string().min(1).optional(),
   RAILWAY_ENVIRONMENT_ID: z.string().min(1).optional(),
   RAILWAY_ENVIRONMENT: z.string().min(1).optional(),
+  AUTH_RATE_LIMIT: z.enum(["on", "off"]).default("on"),
 });
 
 const DEV_AUTH_URL = "http://localhost:5173";
@@ -95,6 +99,9 @@ export function loadConfig(env: NodeJS.ProcessEnv): AppConfig {
   if (!parsed.GOOGLE_CLIENT_ID !== !parsed.GOOGLE_CLIENT_SECRET) {
     missing.push("GOOGLE_CLIENT_ID", "GOOGLE_CLIENT_SECRET");
   }
+  if (parsed.NODE_ENV === "production" && parsed.AUTH_RATE_LIMIT === "off") {
+    missing.push("AUTH_RATE_LIMIT");
+  }
   if (missing.length > 0) throw new ConfigError(missing);
   return {
     nodeEnv: parsed.NODE_ENV,
@@ -120,5 +127,6 @@ export function loadConfig(env: NodeJS.ProcessEnv): AppConfig {
     trustRailwayProxy: Boolean(
       parsed.RAILWAY_ENVIRONMENT_ID || parsed.RAILWAY_ENVIRONMENT,
     ),
+    authRateLimit: parsed.AUTH_RATE_LIMIT === "on",
   };
 }

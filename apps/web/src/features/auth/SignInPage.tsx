@@ -52,8 +52,10 @@ export function SignInPage() {
   });
   const next = safeNext(params.get("next"));
 
-  async function finish() {
-    await client.invalidateQueries({ queryKey: ME_QUERY_KEY });
+  function finish() {
+    // Drop any cached "signed out" answer so the session guard waits for a
+    // fresh one instead of bouncing straight back here.
+    client.removeQueries({ queryKey: ME_QUERY_KEY });
     navigate(next, { replace: true });
   }
 
@@ -79,7 +81,7 @@ export function SignInPage() {
       setTwoFactor(true);
       return;
     }
-    await finish();
+    finish();
   }
 
   async function google() {
@@ -107,7 +109,7 @@ export function SignInPage() {
         </div>
 
         {twoFactor ? (
-          <TwoFactorStep onVerified={() => void finish()} />
+          <TwoFactorStep onVerified={finish} />
         ) : (
           <>
             <Segmented

@@ -17,6 +17,7 @@ export function testConfig(overrides: Partial<AppConfig> = {}): AppConfig {
     signupAllowedEmails: ["owner@example.com"],
     google: undefined,
     trustRailwayProxy: false,
+    authRateLimit: true,
     ...overrides,
   };
 }

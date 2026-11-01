@@ -23,6 +23,9 @@
   passwords until email delivery exists.
 - Added the sign-in page (sign in, create account, Google when configured,
   two-factor step) and the session guard around the app shell.
+- Added the Settings page (profile, password, two-factor setup with QR code
+  and backup codes, sign out / sign out everywhere, household name); e2e now
+  runs the signed-in flow on its own throwaway database.
 
 ## 2026-10-31
 

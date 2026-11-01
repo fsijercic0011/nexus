@@ -3,7 +3,9 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { createMemoryRouter, RouterProvider } from "react-router-dom";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { ME_QUERY_KEY } from "@/hooks/useMe";
 import { stubFetch } from "@/test/fetch";
+import { RequireSession } from "./RequireSession";
 import { SignInPage } from "./SignInPage";
 
 const auth = vi.hoisted(() => ({
@@ -118,5 +120,48 @@ describe("SignInPage", () => {
     expect(
       await screen.findByText("That code didn't work. Try again."),
     ).toBeInTheDocument();
+  });
+
+  it("lands in the app even when an earlier visit cached 'signed out'", async () => {
+    stubFetch({
+      "/api/auth-providers": { body: { google: false } },
+      "/api/me": {
+        body: {
+          user: {
+            id: "u1",
+            name: "Owner",
+            email: "owner@example.com",
+            twoFactorEnabled: false,
+          },
+          household: { id: "h1", name: "My household" },
+          role: "admin",
+        },
+      },
+    });
+    auth.signIn.email.mockResolvedValue({ data: { user: {} }, error: null });
+    const client = new QueryClient({
+      defaultOptions: { queries: { retry: false } },
+    });
+    client.setQueryData(ME_QUERY_KEY, null);
+    const router = createMemoryRouter(
+      [
+        { path: "/sign-in", element: <SignInPage /> },
+        {
+          element: <RequireSession />,
+          children: [{ path: "/", element: <p>home page</p> }],
+        },
+      ],
+      { initialEntries: ["/sign-in"] },
+    );
+    render(
+      <QueryClientProvider client={client}>
+        <RouterProvider router={router} />
+      </QueryClientProvider>,
+    );
+    await userEvent.type(screen.getByLabelText("Email"), "owner@example.com");
+    await userEvent.type(screen.getByLabelText("Password"), "a password");
+    await userEvent.click(screen.getByRole("button", { name: "Sign in" }));
+    expect(await screen.findByText("home page")).toBeInTheDocument();
+    expect(router.state.location.pathname).toBe("/");
   });
 });
