@@ -6,3 +6,6 @@ dist/
 .idea/
 *.log
 .DS_Store
+.neon
+playwright-report/
+test-results/
